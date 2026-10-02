@@ -7,7 +7,14 @@ export const envSchema = z.object({
 
     //Throttler
     THROTTER_TTL_MS: z.coerce.number().default(1000),
-    THROTTLE_LIMIT:  z.coerce.number().default(60)
+    THROTTLE_LIMIT:  z.coerce.number().default(60),
+
+    //Database
+    DB_HOST: z.string().trim().min(1),
+    DB_PORT: z.coerce.number().int().min(1),
+    DB_USERNAME: z.string().trim().min(1),
+    DB_PASSWORD: z.string().min(1),
+    DB_NAME: z.string().trim().min(1)
 })
 
 export type Env = z.infer<typeof envSchema>
@@ -16,7 +23,7 @@ export function validateEnv(config: Record<string, unknown>) : Env {
     const parsed = envSchema.safeParse(config)
 
     if (!parsed.success) {
-        const issues = parsed.error.issues.map((i) => ` - ${i.path.join('.')} : ${i.message}`).join('/n')
+        const issues = parsed.error.issues.map((i) => ` - ${i.path.join('.')} : ${i.message}`).join('\n')
 
         throw new Error(`Invalid enviroment configuration:\n${issues}`)
     }

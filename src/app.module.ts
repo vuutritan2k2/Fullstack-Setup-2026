@@ -7,8 +7,9 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { CorrelationIdMiddleware } from './core/middlewares/correlation-id.middleware';
 import { AllExceptionFilter } from './core/interceptors/all-exception.filter';
-import appConfig from './config/app/app.config';
-import throttlerConfig from './config/throttler/throttler.config';
+import { allConfigs } from './config/configuration';
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { TypeOrmConfigService } from './config/database/typeorm-config.service';
 
 const envFile = process.env.NODE_ENV === 'production' 
 ? ['.env.prod', '.env'] 
@@ -21,10 +22,13 @@ const envFile = process.env.NODE_ENV === 'production'
       cache: true,
       validate: validateEnv,
       envFilePath: envFile,
-      load: [appConfig, throttlerConfig]
+      load: allConfigs
     }),
     PinoLoggerModule,
-    AppThrottlerModule
+    AppThrottlerModule,
+    TypeOrmModule.forRootAsync({
+      useClass: TypeOrmConfigService
+    })
   ],
   controllers: [],
   providers: [
