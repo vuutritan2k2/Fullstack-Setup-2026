@@ -1,7 +1,12 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config'
 import { validateEnv } from './config/env.validation';
 import { PinoLoggerModule } from './config/logger/logger.module';
+import { AppThrottlerModule } from './config/throttler/throttler.module';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard } from '@nestjs/throttler';
+import { CorrelationIdMiddleware } from './middlewares/correlation-id.middeware';
+import { AllExceptionFilter } from './interceptors/all-exception.filter';
 
 const envFile = process.env.NODE_ENV === 'production' 
 ? ['.env.prod', '.env'] 
@@ -15,9 +20,23 @@ const envFile = process.env.NODE_ENV === 'production'
       validate: validateEnv,
       envFilePath: envFile
     }),
-    PinoLoggerModule
+    PinoLoggerModule,
+    AppThrottlerModule
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionFilter
+    }
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CorrelationIdMiddleware).forRoutes('*')
+  }
+}

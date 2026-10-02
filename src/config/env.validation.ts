@@ -3,7 +3,11 @@ import {number, z} from 'zod'
 export const envSchema = z.object({
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
     PORT: z.coerce.number().default(8080),
-    CLIENT_URL: z.string()
+    CLIENT_URL: z.string(),
+
+    //Throttler
+    THROTTER_TTL_MS: z.coerce.number().default(1000),
+    THROTTLE_LIMIT:  z.coerce.number().default(60)
 })
 
 export type Env = z.infer<typeof envSchema>

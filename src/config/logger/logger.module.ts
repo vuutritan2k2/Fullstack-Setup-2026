@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { randomUUID } from 'crypto';
 import { IncomingMessage } from 'http';
 import { LoggerModule } from 'nestjs-pino' 
 
@@ -19,6 +20,12 @@ import { LoggerModule } from 'nestjs-pino'
                                 translateTime: 'SYS:standard'
                             }
                         } : undefined,
+                        genReqId: (req, res) => {
+                            const existing = req.headers['x-request-id']
+                            const id = existing ?? randomUUID()
+                            res.setHeader('x-request-id', id)
+                            return id
+                        },
                         redact: {
                             paths: [
                                 'req.headers.authorization',
