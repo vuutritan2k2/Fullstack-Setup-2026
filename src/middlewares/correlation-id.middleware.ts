@@ -13,5 +13,6 @@ export class CorrelationIdMiddleware implements NestMiddleware {
         req.headers[CORRELATION_ID_HEADER] = requestId
         res.setHeader(CORRELATION_ID_HEADER, requestId)
 
+        next()
     }
 }
