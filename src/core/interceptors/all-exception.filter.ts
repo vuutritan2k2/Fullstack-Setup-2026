@@ -1,7 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, Injectable } from "@nestjs/common";
 import { Request, Response } from "express";
 import { PinoLogger } from "nestjs-pino";
-import { buildApiErrorPayload, extractFromHttpExceptionBody, payloadFromUnknownException } from "src/helpers/api-error-response";
+import { buildApiErrorPayload, extractFromHttpExceptionBody, payloadFromUnknownException } from "src/shared/helpers/api-error-response";
 
 @Catch()
 @Injectable()
